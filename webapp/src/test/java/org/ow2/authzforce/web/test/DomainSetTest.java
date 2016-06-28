@@ -108,7 +108,7 @@ public class DomainSetTest extends RestServiceTest
 		javax.ws.rs.core.Response response = builder.get();
 		assertEquals(response.getStatus(), javax.ws.rs.core.Response.Status.OK.getStatusCode());
 	}
-
+	
 	@Parameters({ "remote.base.url", "enableFastInfoset" })
 	@Test()
 	public void getDomainsWithoutAcceptHeader(@Optional String remoteAppBaseUrlParam, @Optional("false") Boolean enableFastInfoset)
@@ -128,6 +128,27 @@ public class DomainSetTest extends RestServiceTest
 		javax.ws.rs.core.Response response = builder.get();
 		assertEquals(response.getStatus(), javax.ws.rs.core.Response.Status.OK.getStatusCode());
 		assertEquals(response.getMediaType(), MediaType.APPLICATION_XML_TYPE);
+	}
+
+	@Parameters({ "remote.base.url", "enableFastInfoset" })
+	@Test()
+	public void getDomainsWithJsonAcceptHeader(@Optional String remoteAppBaseUrlParam, @Optional("false") Boolean enableFastInfoset)
+	{
+		// try to use application/fastinfoset
+		final String remoteAppBaseUrl = remoteAppBaseUrlParam == null || remoteAppBaseUrlParam.isEmpty() ? WebClient.getConfig(domainsAPIProxyClient).getEndpoint().getEndpointInfo().getAddress()
+				: remoteAppBaseUrlParam;
+		WebTarget target = ClientBuilder.newClient().target(remoteAppBaseUrl).path("domains");
+		Invocation.Builder builder = target.request().accept(MediaType.APPLICATION_JSON_TYPE);
+		// if (LOGGER.isDebugEnabled())
+		// {
+		final ClientConfiguration builderConf = WebClient.getConfig(builder);
+		builderConf.getInInterceptors().add(new LoggingInInterceptor());
+		builderConf.getOutInterceptors().add(new LoggingOutInterceptor());
+		// }
+
+		javax.ws.rs.core.Response response = builder.get();
+		assertEquals(response.getStatus(), javax.ws.rs.core.Response.Status.OK.getStatusCode());
+		assertEquals(response.getMediaType(), MediaType.APPLICATION_JSON_TYPE);
 	}
 
 	/**

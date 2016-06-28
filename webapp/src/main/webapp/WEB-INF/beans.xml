@@ -107,6 +107,7 @@
             <bean class="org.ow2.authzforce.rest.service.jaxrs.BadRequestExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ClientErrorExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
          </jaxrs:providers>
          <jaxrs:properties>
             <entry key="org.apache.cxf.propagate.exception" value="false" />
@@ -141,6 +142,7 @@
             <bean class="org.ow2.authzforce.rest.service.jaxrs.BadRequestExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ClientErrorExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
          </jaxrs:providers>
          <jaxrs:properties>
             <entry key="org.apache.cxf.propagate.exception" value="false" />
