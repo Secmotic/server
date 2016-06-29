@@ -24,12 +24,13 @@
 		tests will make sure this does not happen to avoid false results. -->
 	<parameter name="legacy.fs" value="true" />
 	<parameter name="enableFastInfoset" value="false" />
+	<parameter name="enableJsonFormat" value ="false" />
 	<parameter name="org.ow2.authzforce.domain.maxPolicyCount"
 		value="5" />
 	<parameter name="org.ow2.authzforce.domain.policy.maxVersionCount"
 		value="5" />
 	<test
-		name="DemoTest_FastInfoset:No.AutoSync:No.AutoVersionRemovalIfTooMany:No"
+		name="DemoTest_FastInfoset:No.AutoSync:No.AutoVersionRemovalIfTooMany:No.JsonFormat:No"
 		preserve-order="true" enabled="true">
 		<!-- Test using default parameter values -->
 		<classes>

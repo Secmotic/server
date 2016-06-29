@@ -48,6 +48,8 @@
         <value>application/fastinfoset</value>
     </util:list>
 	
+	<bean id="clientJsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+	
 	<bean id="clientJaxbProviderFI" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
 		<property name="singleJaxbContext" value="true" />
 		<property name="extraClass" value="#{extraJaxbClasses.toArray()}" />
