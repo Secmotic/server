@@ -102,12 +102,12 @@
             <ref bean="domainsResourceBean" />
          </jaxrs:serviceBeans>
          <jaxrs:providers>
-            <bean class="org.ow2.authzforce.rest.service.jaxrs.XmlOnlyMediaTypeRequestFilter" />
+            <bean class="org.ow2.authzforce.rest.service.jaxrs.XmlAndJsonOnlyMediaTypeRequestFilter" />
             <ref bean="jaxbProvider" />
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />            
             <bean class="org.ow2.authzforce.rest.service.jaxrs.BadRequestExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ClientErrorExceptionMapper" />
-            <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
+            <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />            
          </jaxrs:providers>
          <jaxrs:properties>
             <entry key="org.apache.cxf.propagate.exception" value="false" />
@@ -138,11 +138,10 @@
             <ref bean="domainsResourceBean" />
          </jaxrs:serviceBeans>
          <jaxrs:providers>
-            <ref bean="jaxbProvider" />
+            <ref bean="jaxbProvider" />            
             <bean class="org.ow2.authzforce.rest.service.jaxrs.BadRequestExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ClientErrorExceptionMapper" />
-            <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider"/>
+            <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />            
          </jaxrs:providers>
          <jaxrs:properties>
             <entry key="org.apache.cxf.propagate.exception" value="false" />
