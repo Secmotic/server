@@ -15,7 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,10 +28,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
-
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Request;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -60,6 +58,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.Request;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
 
 @ContextConfiguration(locations = { "classpath:META-INF/spring/client.xml" })
 abstract class RestServiceTest extends AbstractTestNGSpringContextTests
@@ -206,6 +210,10 @@ abstract class RestServiceTest extends AbstractTestNGSpringContextTests
 	@Autowired
 	@Qualifier("clientJaxbProvider")
 	private JAXBElementProvider<?> clientJaxbProvider;
+	
+	@Autowired
+	@Qualifier("clientJsonProvider")
+	private JacksonJsonProvider clientJsonJaxbProvider;
 
 	@Autowired
 	@Qualifier("clientJaxbProviderFI")
@@ -351,7 +359,7 @@ abstract class RestServiceTest extends AbstractTestNGSpringContextTests
 		return embeddedServer;
 	}
 
-	protected void startServerAndInitCLient(String remoteAppBaseUrl, boolean enableFastInfoset, int domainSyncIntervalSec) throws Exception
+	protected void startServerAndInitCLient(String remoteAppBaseUrl, boolean enableFastInfoset, int domainSyncIntervalSec, boolean enableJsonFormat) throws Exception
 	{
 		/*
 		 * If embedded server not started and remoteAppBaseUrl null/empty (i.e. server/app to be started locally (embedded))
@@ -416,14 +424,25 @@ abstract class RestServiceTest extends AbstractTestNGSpringContextTests
 			checkFiInterceptors(proxyClientConf);
 		} else
 		{
-			domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, Collections.singletonList(clientJaxbProvider));
-			proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
-			/*
-			 * WARNING: XmlMediaTypeHeaderSetter forces Accept header to be "application/xml" only; else if Accept "application/fastinfoset" sent as well, the server returns fastinfoset which causes
-			 * error on this client-side since not supported
-			 */
-			proxyClientConf.getOutInterceptors().add(new XmlMediaTypeHeaderSetter(false));
+			if(enableJsonFormat) {	
+				List<Object> providers = new ArrayList<Object>();
+			    providers.add( clientJsonJaxbProvider );
+				domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, providers);
+				proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
+				proxyClientConf.getHttpConduit().getClient().setAccept("application/json");
+				
+			} else {				
+				domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, Collections.singletonList(clientJaxbProviderFI));			
+				proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
+				/*
+				 * WARNING: XmlMediaTypeHeaderSetter forces Accept header to be "application/xml" only; else if Accept "application/fastinfoset" sent as well, the server returns fastinfoset which causes
+				 * error on this client-side since not supported
+				 */			
+				proxyClientConf.getOutInterceptors().add(new XmlMediaTypeHeaderSetter(false));
+			}
 		}
+		
+		
 
 		/**
 		 * Request/response logging (for debugging).

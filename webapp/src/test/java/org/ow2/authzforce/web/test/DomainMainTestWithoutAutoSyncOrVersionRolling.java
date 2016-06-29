@@ -117,13 +117,14 @@ public class DomainMainTestWithoutAutoSyncOrVersionRolling extends RestServiceTe
 	 * @param remoteAppBaseUrl
 	 * @param enableFastInfoset
 	 * @param domainSyncIntervalSec
+	 * @param enableJsonFormat
 	 * @throws Exception
 	 */
-	@Parameters({ "remote.base.url", "enableFastInfoset", "org.ow2.authzforce.domains.sync.interval" })
+	@Parameters({ "remote.base.url", "enableFastInfoset", "org.ow2.authzforce.domains.sync.interval", "enableJsonFormat" })
 	@BeforeTest()
-	public void beforeTest(@Optional String remoteAppBaseUrl, @Optional("false") boolean enableFastInfoset, @Optional("-1") int domainSyncIntervalSec) throws Exception
+	public void beforeTest(@Optional String remoteAppBaseUrl, @Optional("false") boolean enableFastInfoset, @Optional("-1") int domainSyncIntervalSec, @Optional("false") Boolean enableJsonFormat) throws Exception
 	{
-		startServerAndInitCLient(remoteAppBaseUrl, enableFastInfoset, domainSyncIntervalSec);
+		startServerAndInitCLient(remoteAppBaseUrl, enableFastInfoset, domainSyncIntervalSec, enableJsonFormat);
 	}
 
 	/**
@@ -141,13 +142,14 @@ public class DomainMainTestWithoutAutoSyncOrVersionRolling extends RestServiceTe
 	/**
 	 * @param remoteAppBaseUrl
 	 * @param enableFastInfoset
+	 * @param enableJsonFormat
 	 * @throws Exception
 	 * 
 	 *             NB: use Boolean class instead of boolean primitive type for Testng parameter, else the default value in @Optional annotation is not handled properly.
 	 */
-	@Parameters({ "remote.base.url", "enableFastInfoset" })
+	@Parameters({ "remote.base.url", "enableFastInfoset", "enableJsonFormat" })
 	@BeforeClass
-	public void addDomain(@Optional String remoteAppBaseUrl, @Optional("false") Boolean enableFastInfoset) throws Exception
+	public void addDomain(@Optional String remoteAppBaseUrl, @Optional("false") Boolean enableFastInfoset, @Optional("false") Boolean enableJsonFormat) throws Exception
 	{
 		final Link domainLink = domainsAPIProxyClient.addDomain(new DomainProperties("Some description", testDomainExternalId));
 		assertNotNull(domainLink, "Domain creation failure");
@@ -351,7 +353,7 @@ public class DomainMainTestWithoutAutoSyncOrVersionRolling extends RestServiceTe
 		assertNotNull(resources);
 		assertTrue(resources.getLinks().size() > 0, "No resource for root policy found");
 	}
-
+	
 	@Test(dependsOnMethods = { "getDomainProperties", "getPolicies" })
 	public void getRootPolicy()
 	{
