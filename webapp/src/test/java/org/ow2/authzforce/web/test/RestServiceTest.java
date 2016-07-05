@@ -357,7 +357,7 @@ abstract class RestServiceTest extends AbstractTestNGSpringContextTests
 		embeddedServer.start();
 
 		return embeddedServer;
-	}
+	}	
 
 	protected void startServerAndInitCLient(String remoteAppBaseUrl, boolean enableFastInfoset, int domainSyncIntervalSec, boolean enableJsonFormat) throws Exception
 	{
@@ -424,22 +424,22 @@ abstract class RestServiceTest extends AbstractTestNGSpringContextTests
 			checkFiInterceptors(proxyClientConf);
 		} else
 		{
-			if(enableJsonFormat) {	
-				List<Object> providers = new ArrayList<Object>();
-			    providers.add( clientJsonJaxbProvider );
-				domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, providers);
-				proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
+			List<Object> providers = new ArrayList<Object>();
+			providers.add(Collections.singletonList(clientJaxbProvider));
+			if(enableJsonFormat) {
+				providers.add(clientJsonJaxbProvider);
+			}
+			domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, providers);
+			proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
+			if(enableJsonFormat) { 
 				proxyClientConf.getHttpConduit().getClient().setAccept("application/json");
 				
-			} else {				
-				domainsAPIProxyClient = JAXRSClientFactory.create(serverBaseAddress, DomainsResource.class, Collections.singletonList(clientJaxbProviderFI));			
-				proxyClientConf = WebClient.getConfig(domainsAPIProxyClient);
-				/*
-				 * WARNING: XmlMediaTypeHeaderSetter forces Accept header to be "application/xml" only; else if Accept "application/fastinfoset" sent as well, the server returns fastinfoset which causes
-				 * error on this client-side since not supported
-				 */			
-				proxyClientConf.getOutInterceptors().add(new XmlMediaTypeHeaderSetter(false));
-			}
+			} 
+			/*
+			 * WARNING: XmlMediaTypeHeaderSetter forces Accept header to be "application/xml" only; else if Accept "application/fastinfoset" sent as well, the server returns fastinfoset which causes
+			 * error on this client-side since not supported
+			 */
+			proxyClientConf.getOutInterceptors().add(new XmlMediaTypeHeaderSetter(false));
 		}
 		
 		

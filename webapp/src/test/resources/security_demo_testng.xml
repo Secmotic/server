@@ -29,10 +29,27 @@
 		value="5" />
 	<parameter name="org.ow2.authzforce.domain.policy.maxVersionCount"
 		value="5" />
-	<test
-		name="DemoTest_FastInfoset:No.AutoSync:No.AutoVersionRemovalIfTooMany:No.JsonFormat:No"
+	<test name="DemoTest_FastInfoset:No.AutoSync:No.AutoVersionRemovalIfTooMany:No.JsonFormat:No"
 		preserve-order="true" enabled="true">
 		<!-- Test using default parameter values -->
+		<classes>
+			<class name="org.ow2.authzforce.rest.service.test.SecurityDemoTest">
+				<methods>
+					<include name="addPolicyWithTooBigId" />
+					<include name="addPolicyWithTooBigDescription" />
+					<include name="addPolicyWithTooManyChildElements" />
+					<include name="addPolicyTooDeep" />
+					<include name="setRootPolicyWithCircularPolicyRef" />
+					<include name="setRootPolicyWithTooDeepPolicyRef" />
+					<include name="addTooManyPolicies" />
+					<include name="addTooManyPolicyVersions" />
+				</methods>
+			</class>
+		</classes>
+	</test>
+	<test name="DemoTest_FastInfoset:No.AutoSync:No.AutoVersionRemovalIfTooMany:No.JsonFormat:Yes"
+		preserve-order="true" enabled="true">
+		<parameter name="enableJsonFormat" value ="true" />
 		<classes>
 			<class name="org.ow2.authzforce.rest.service.test.SecurityDemoTest">
 				<methods>

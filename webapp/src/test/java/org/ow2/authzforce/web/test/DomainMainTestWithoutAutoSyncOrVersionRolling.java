@@ -315,11 +315,9 @@ public class DomainMainTestWithoutAutoSyncOrVersionRolling extends RestServiceTe
 	public void updateAttributeProviders() throws JAXBException
 	{
 		final AttributeProvidersResource attributeProvidersResource = testDomain.getPapResource().getAttributeProvidersResource();
-		JAXBElement<TestAttributeProvider> jaxbElt = testDomainHelper
-				.unmarshal(new File(RestServiceTest.XACML_SAMPLES_DIR, "pdp/IIA002(PolicySet)/attributeProvider.xml"), TestAttributeProvider.class);
+		JAXBElement<TestAttributeProvider> jaxbElt = testDomainHelper.unmarshal(new File(RestServiceTest.XACML_SAMPLES_DIR, "pdp/IIA002(PolicySet)/attributeProvider.xml"), TestAttributeProvider.class);
 		TestAttributeProvider testAttrProvider = jaxbElt.getValue();
-		AttributeProviders updateAttrProvidersResult = attributeProvidersResource.updateAttributeProviderList(new AttributeProviders(Collections
-				.<AbstractAttributeProvider> singletonList(testAttrProvider)));
+		AttributeProviders updateAttrProvidersResult = attributeProvidersResource.updateAttributeProviderList(new AttributeProviders(Collections.<AbstractAttributeProvider> singletonList(testAttrProvider)));
 		assertNotNull(updateAttrProvidersResult);
 		assertEquals(updateAttrProvidersResult.getAttributeProviders().size(), 1);
 		AbstractAttributeProvider updateAttrProvidersItem = updateAttrProvidersResult.getAttributeProviders().get(0);

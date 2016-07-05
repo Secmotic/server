@@ -3,9 +3,11 @@
    as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. AuthZForce is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public 
    License along with AuthZForce. If not, see <http://www.gnu.org/licenses/>. -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
-   xmlns:jee="http://www.springframework.org/schema/jee" xmlns:cxf="http://cxf.apache.org/core"
-   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
+   	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:cxf="http://cxf.apache.org/core"
+   	xmlns:p="http://www.springframework.org/schema/p"
+   	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 						http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 						http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
@@ -44,6 +46,35 @@
       <property name="catalogLocation" value="#{jndi_configDir}/catalog.xml" />
       <property name="schemaLocations" ref="apiSchemaLocations" />
    </bean>
+   
+   
+   <bean id="jaxbAnnotationIntrospector" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector" />
+	<bean id="jacksonAnnotationIntrospector" class="com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector" />
+	
+	<bean id="pairedAnnotationIntrospector" class="com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair">
+		<constructor-arg ref="jaxbAnnotationIntrospector" />   
+		<constructor-arg ref="jacksonAnnotationIntrospector" />                 
+	</bean>
+		
+	 <bean id="jacksonObjectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+	 p:autoDetectFields="false" p:autoDetectGettersSetters="false" p:annotationIntrospector-ref="pairedAnnotationIntrospector">
+	 	<property name="objectMapper">
+			<bean class="com.fasterxml.jackson.databind.ObjectMapper" />
+		</property>
+		<property name="featuresToEnable">
+			<array>
+				<util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES" />
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING" />
+				<util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING" />			
+			</array>
+		</property>
+		<property name="featuresToDisable">
+			<array>
+				<util:constant static-field="com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES" />
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS" />				
+			</array>
+		</property>
+	 </bean>		 
 
    <beans profile="-fastinfoset">
       <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
@@ -95,16 +126,21 @@
          </constructor-arg>
       </bean>
    </beans>
-
+			
    <beans profile="-fastinfoset">
-      <jaxrs:server id="tazService" address="/" docLocation="classpath:/authz-api.wadl" staticSubresourceResolution="true">
+      <jaxrs:server id="tazService" address="/" docLocation="classpath:/authz-api.json.wadl" staticSubresourceResolution="true">
          <jaxrs:serviceBeans>
             <ref bean="domainsResourceBean" />
          </jaxrs:serviceBeans>
+         
          <jaxrs:providers>
             <bean class="org.ow2.authzforce.rest.service.jaxrs.XmlAndJsonOnlyMediaTypeRequestFilter" />
             <ref bean="jaxbProvider" />
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />            
+            
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">            
+            	<constructor-arg ref="jacksonObjectMapper" />
+            </bean>
+            
             <bean class="org.ow2.authzforce.rest.service.jaxrs.BadRequestExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ClientErrorExceptionMapper" />
             <bean class="org.ow2.authzforce.rest.service.jaxrs.ServerErrorExceptionMapper" />            
@@ -133,7 +169,7 @@
    </beans>
 
    <beans profile="+fastinfoset">
-      <jaxrs:server id="tazService" address="/" docLocation="classpath:/authz-api.fastinfoset.wadl" staticSubresourceResolution="true">
+      <jaxrs:server id="tazService" address="/" docLocation="classpath:/authz-api.json.fastinfoset.wadl" staticSubresourceResolution="true">
          <jaxrs:serviceBeans>
             <ref bean="domainsResourceBean" />
          </jaxrs:serviceBeans>

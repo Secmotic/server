@@ -42,6 +42,7 @@ import org.ow2.authzforce.rest.api.xmlns.DomainProperties;
 import org.ow2.authzforce.rest.api.xmlns.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.testng.SkipException;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -128,27 +129,6 @@ public class DomainSetTest extends RestServiceTest
 		javax.ws.rs.core.Response response = builder.get();
 		assertEquals(response.getStatus(), javax.ws.rs.core.Response.Status.OK.getStatusCode());
 		assertEquals(response.getMediaType(), MediaType.APPLICATION_XML_TYPE);
-	}
-
-	@Parameters({ "remote.base.url", "enableFastInfoset" })
-	@Test()
-	public void getDomainsWithJsonAcceptHeader(@Optional String remoteAppBaseUrlParam, @Optional("false") Boolean enableFastInfoset)
-	{
-		// try to use application/fastinfoset
-		final String remoteAppBaseUrl = remoteAppBaseUrlParam == null || remoteAppBaseUrlParam.isEmpty() ? WebClient.getConfig(domainsAPIProxyClient).getEndpoint().getEndpointInfo().getAddress()
-				: remoteAppBaseUrlParam;
-		WebTarget target = ClientBuilder.newClient().target(remoteAppBaseUrl).path("domains");
-		Invocation.Builder builder = target.request().accept(MediaType.APPLICATION_JSON_TYPE);
-		// if (LOGGER.isDebugEnabled())
-		// {
-		final ClientConfiguration builderConf = WebClient.getConfig(builder);
-		builderConf.getInInterceptors().add(new LoggingInInterceptor());
-		builderConf.getOutInterceptors().add(new LoggingOutInterceptor());
-		// }
-		
-		javax.ws.rs.core.Response response = builder.get();
-		assertEquals(response.getStatus(), javax.ws.rs.core.Response.Status.OK.getStatusCode());
-		assertEquals(response.getMediaType(), MediaType.APPLICATION_JSON_TYPE);
 	}
 
 	/**
@@ -438,15 +418,17 @@ public class DomainSetTest extends RestServiceTest
 		createdDomainIds.remove(SAMPLE_DOMAIN_ID);
 	}
 
-	@Parameters({ "remote.base.url" })
+	@Parameters({ "remote.base.url", "enableJsonFormat"})
 	@Test(dependsOnMethods = { "deleteDomainAfterDirectoryDeleted" })
-	public void getPdpAfterDomainDirCreated(@Optional String remoteAppBaseUrl) throws IllegalArgumentException, IOException, JAXBException
+	public void getPdpAfterDomainDirCreated(@Optional String remoteAppBaseUrl, @Optional("false") Boolean enableJsonFormat) throws IllegalArgumentException, IOException, JAXBException
 	{
 		// skip test if server is remote (remoteAppBaseUrl != null)
 		if (remoteAppBaseUrl != null && !remoteAppBaseUrl.isEmpty())
 		{
 			return;
 		}
+		
+//		if(enableJsonFormat) { throw new SkipException("Not supported in Json mode"); }
 
 		// verify domain does not exist by trying the PDP
 		DomainResource testDomainRes = domainsAPIProxyClient.getDomainResource(SAMPLE_DOMAIN_ID);

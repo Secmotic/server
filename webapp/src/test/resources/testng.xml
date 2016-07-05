@@ -17,38 +17,9 @@
    <!-- Domains sync interval (seconds) -->
    <parameter name="org.ow2.authzforce.domains.sync.interval" value="0" />
       
-   <test name="Test_FastInfoset:No.AutoSync:No.VersionRolling:No.JsonFormat:Yes" preserve-order="true" enabled="true">
-      <parameter name="enableJsonFormat" value ="true" />
-      <classes>
-      	<class name="org.ow2.authzforce.web.test.DomainSetTest">
-            <methods>
-               <include name="getWADL" />
-               <include name="getDomainsWithoutAcceptHeader" />               
-               <include name="getDomainsWithBadAcceptHeader" />
-               <include name="getDomainsWithJsonAcceptHeader" />                   
-               <!-- 'invocation-numbers' attribute on include element not working as expected: https://github.com/cbeust/testng/issues/613 -->
-               <include name="addAndGetDomain" />
-               <include name="getDomains" />
-               <include name="getDomain" />
-               <include name="getDomainByExternalId" />
-               <include name="addDomainWithTooBigDescription" />
-               <include name="addDomainWithTooBigExternalId" />
-               <include name="deleteDomain" />
-               <include name="getDomainsAfterFileModifications" />
-               <include name="deleteDomainAfterDirectoryDeleted" />
-               <include name="getPdpAfterDomainDirCreated" />
-               <include name="deleteDomains" />
-            </methods>
-         </class>
-         <!-- Domain-specific testing -->
-         <class name="org.ow2.authzforce.web.test.DomainMainTestWithoutAutoSyncOrVersionRolling" />
-      </classes>
-   </test>
-   
    <test name="Test_FastInfoset:No.AutoSync:No.VersionRolling:No.JsonFormat:No" preserve-order="true" enabled="true">
       <!-- <parameter name="enableFastInfoset" value="false" /> -->
       <!-- Test using default parameter values -->
-      <parameter name="enableJsonFormat" value ="false" />
       <classes>
          <class name="org.ow2.authzforce.web.test.DomainSetTest">
             <methods>
@@ -76,7 +47,6 @@
    <test name="Test_FastInfoset:Yes.AutoSync:No.VersionRolling:No.JsonFormat:No" preserve-order="true" enabled="true">
       <!-- Same tests as before but with FastInfoset-capable client -->
       <parameter name="enableFastInfoset" value="true" />
-      <parameter name="enableJsonFormat" value ="false" />
       <classes>
          <class name="org.ow2.authzforce.web.test.DomainSetTest">
             <methods>
@@ -106,6 +76,33 @@
       <classes>
          <!-- Domain-specific testing -->
          <class name="org.ow2.authzforce.web.test.DomainTestWithAutoSyncAndVersionRolling" />
+      </classes>
+   </test>
+   <!-- JSON related tests -->
+   <test name="Test_FastInfoset:No.AutoSync:No.VersionRolling:No.JsonFormat:Yes" preserve-order="true" enabled="true">
+      <parameter name="enableJsonFormat" value ="true" />
+      <classes>
+      	<class name="org.ow2.authzforce.web.test.DomainSetTest">
+            <methods>
+               <include name="getWADL" />
+               <include name="getDomainsWithoutAcceptHeader" />               
+               <include name="getDomainsWithBadAcceptHeader" />
+               <!-- 'invocation-numbers' attribute on include element not working as expected: https://github.com/cbeust/testng/issues/613 -->
+               <include name="addAndGetDomain" />
+               <include name="getDomains" />
+               <include name="getDomain" />
+               <include name="getDomainByExternalId" />
+               <include name="addDomainWithTooBigDescription" />
+               <include name="addDomainWithTooBigExternalId" />
+               <include name="deleteDomain" />
+               <include name="getDomainsAfterFileModifications" />
+               <include name="deleteDomainAfterDirectoryDeleted" />
+               <include name="getPdpAfterDomainDirCreated" />
+               <include name="deleteDomains" />
+            </methods>
+         </class>
+         <!-- Domain-specific testing -->
+         <class name="org.ow2.authzforce.web.test.DomainMainTestWithoutAutoSyncOrVersionRolling" />
       </classes>
    </test>
 </suite> 
